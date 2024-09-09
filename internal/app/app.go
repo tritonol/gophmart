@@ -7,6 +7,7 @@ import (
 	"github.com/tritonol/gophmart.git/internal/config"
 	repoUser "github.com/tritonol/gophmart.git/internal/repository/User"
 	"github.com/tritonol/gophmart.git/internal/storage/pg"
+	"github.com/tritonol/gophmart.git/internal/usecase/auth"
 )
 
 func Run() {
@@ -28,7 +29,8 @@ func Run() {
 
 	// TODO: init repos
 	repoAuth := repoUser.New(ctx, db)
-	_ = repoAuth
 
 	// TODO: init usecases
+	authUc := auth.New(repoAuth)
+	_ = authUc
 }
