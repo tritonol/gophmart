@@ -11,7 +11,7 @@ type Config struct {
 	AccrualAddress string
 }
 
-func MustLoad() *Config {
+func MustLoad() (*Config, error) {
 	var cfg Config
 	flag.StringVar(&cfg.RunAddress, "a", ":8000", "Address to run server")
 	flag.StringVar(&cfg.DbUri, "d", "", "Datatbase connection string")
@@ -30,5 +30,5 @@ func MustLoad() *Config {
 		cfg.AccrualAddress = accrualAddress
 	}
 
-	return &cfg
+	return &cfg, nil
 }
