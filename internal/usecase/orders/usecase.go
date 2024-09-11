@@ -7,15 +7,15 @@ import (
 )
 
 type orderUsecase struct {
-	orders  OrderRpository
+	orders  orderRpository
 }
 
-type OrderRpository interface {
+type orderRpository interface {
 	Create(ctx context.Context, model *models.Order) error
 	GetUserOrders(ctx context.Context, userId models.UserID) ([]*models.Order, error)
 }
 
-func New(orders OrderRpository) *orderUsecase {
+func New(orders orderRpository) *orderUsecase {
 	return &orderUsecase{
 		orders:  orders,
 	}
