@@ -10,7 +10,8 @@ const (
 )
 
 type Order struct {
-	Id     int64
-	UserId UserID
-	Status OrderStatus
+	Id      int64
+	UserId  UserID
+	Accrual float64
+	Status  OrderStatus
 }
