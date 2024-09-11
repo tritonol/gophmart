@@ -13,10 +13,11 @@ import (
 )
 
 type order struct {
-	Id         int64  `db:"id"`
-	UserId     int64  `db:"user_id"`
-	Status     string `db:"status"`
-	UploadedAt string `db:"uploaded_at"`
+	Id         int64   `db:"id"`
+	UserId     int64   `db:"user_id"`
+	Status     string  `db:"status"`
+	Accrual    float64 `db:"value"`
+	UploadedAt string  `db:"uploaded_at"`
 }
 
 type OrderRepo struct {
@@ -64,8 +65,9 @@ func (r *OrderRepo) Create(ctx context.Context, model *models.Order) error {
 func (r *OrderRepo) GetUserOrders(ctx context.Context, userId models.UserID) ([]*models.Order, error) {
 	res := make([]order, 0)
 	query := `
-		SELECT id, user_id, status, uploaded_at FROM orders
-		WHERE user_id =$1
+		SELECT o.*, b.value FROM orders o
+		JOIN balance b ON o.id = b.from_id
+		WHERE user_id = $1
 		ORDER BY uploaded_at
 	`
 	err := r.conn.SelectContext(ctx, &res, query, userId)
@@ -76,7 +78,7 @@ func (r *OrderRepo) GetUserOrders(ctx context.Context, userId models.UserID) ([]
 	return toModels(res), nil
 }
 
-func (r *OrderRepo) isExistsForUser(ctx context.Context, order order) (bool, error){
+func (r *OrderRepo) isExistsForUser(ctx context.Context, order order) (bool, error) {
 	var exists bool
 
 	err := r.conn.QueryRowContext(
@@ -85,7 +87,7 @@ func (r *OrderRepo) isExistsForUser(ctx context.Context, order order) (bool, err
 		order.Id, order.UserId,
 	).Scan(&exists)
 	if err != nil {
-		return false, err 
+		return false, err
 	}
 
 	return exists, nil
@@ -111,8 +113,9 @@ func toModels(orders []order) []*models.Order {
 
 func toModel(order order) *models.Order {
 	return &models.Order{
-		Id:     order.Id,
-		Status: models.OrderStatus(order.Status),
-		UserId: models.UserID(order.UserId),
+		Id:      order.Id,
+		Status:  models.OrderStatus(order.Status),
+		UserId:  models.UserID(order.UserId),
+		Accrual: order.Accrual,
 	}
 }
