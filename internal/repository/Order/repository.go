@@ -78,6 +78,36 @@ func (r *OrderRepo) GetUserOrders(ctx context.Context, userId models.UserID) ([]
 	return toModels(res), nil
 }
 
+func (r *OrderRepo) UpdateStatus(ctx context.Context, orderId int64, status string) error {
+	_, err := r.conn.ExecContext(ctx, `
+		UPDATE orders SET status = $1
+		WHERE order_id = $2
+		`,
+		orderId, status,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *OrderRepo) GetUnhandledOrders(ctx context.Context) ([]*models.Order, error) {
+	query := `
+		SELECT id, status, user_id FROM orders
+		WHERE status != 'INVALID' ADN status != 'PROCESSED'
+	`
+	orders := make([]order, 0)
+
+	err := r.conn.SelectContext(ctx, &orders, query)
+	if err != nil {
+		return nil, err
+	}
+
+	return toModels(orders), nil
+}
+
 func (r *OrderRepo) isExistsForUser(ctx context.Context, order order) (bool, error) {
 	var exists bool
 
