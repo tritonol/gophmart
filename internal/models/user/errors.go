@@ -2,23 +2,23 @@ package user
 
 import "fmt"
 
-type userAlreadyExistsError struct {
+type UserAlreadyExistsError struct {
 	err   error
 	login string
 }
 
-func NewUserAlreadyExistsError(login string, err error) *userAlreadyExistsError {
-	return &userAlreadyExistsError{
+func NewUserAlreadyExistsError(login string, err error) *UserAlreadyExistsError {
+	return &UserAlreadyExistsError{
 		login: login,
 		err:   err,
 	}
 }
 
-func (u *userAlreadyExistsError) Error() string {
+func (u *UserAlreadyExistsError) Error() string {
 	return fmt.Sprintf("login %s already exists: %s", u.login, u.err)
 }
 
-func (u *userAlreadyExistsError) Unwrap() error {
+func (u *UserAlreadyExistsError) Unwrap() error {
 	return u.err
 }
 
