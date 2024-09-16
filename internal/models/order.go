@@ -1,5 +1,7 @@
 package models
 
+import "github.com/tritonol/gophmart.git/internal/models/user"
+
 type OrderStatus string
 
 const (
@@ -11,7 +13,7 @@ const (
 
 type Order struct {
 	Id      int64
-	UserId  UserID
+	UserId  user.UserID
 	Accrual float64
 	Status  OrderStatus
 }
