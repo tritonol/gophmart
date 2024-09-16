@@ -7,7 +7,7 @@ import (
 	"fmt"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/tritonol/gophmart.git/internal/models"
+	"github.com/tritonol/gophmart.git/internal/models/user"
 )
 
 const (
@@ -17,7 +17,7 @@ const (
 
 type Claims struct {
 	jwt.RegisteredClaims
-	Id models.UserID
+	Id user.UserID
 }
 
 type authUsecase struct {
@@ -25,8 +25,8 @@ type authUsecase struct {
 }
 
 type AuthRepo interface {
-	Create(ctx context.Context, credentials models.UserCredentials) (models.UserID, error)
-	CheckByCredentials(ctx context.Context, credentials models.UserCredentials) (models.UserID, error)
+	Create(ctx context.Context, credentials user.UserCredentials) (user.UserID, error)
+	CheckByCredentials(ctx context.Context, credentials user.UserCredentials) (user.UserID, error)
 }
 
 func New(repo AuthRepo) *authUsecase {
@@ -35,7 +35,7 @@ func New(repo AuthRepo) *authUsecase {
 	}
 }
 
-func (uc *authUsecase) Register(ctx context.Context, credetials models.UserCredentials) (string, error) {
+func (uc *authUsecase) Register(ctx context.Context, credetials user.UserCredentials) (string, error) {
 	if credetials.Login == "" && credetials.Password == "" {
 		return "", fmt.Errorf("wrong credentials")
 	}
@@ -54,7 +54,7 @@ func (uc *authUsecase) Register(ctx context.Context, credetials models.UserCrede
 	return buildJwt(userId)
 }
 
-func (uc *authUsecase) Login(ctx context.Context, credentials models.UserCredentials) (string, error) {
+func (uc *authUsecase) Login(ctx context.Context, credentials user.UserCredentials) (string, error) {
 	hashedPass, err := sha1Hash(credentials.Password)
 	if err != nil {
 		return "", err
@@ -69,7 +69,7 @@ func (uc *authUsecase) Login(ctx context.Context, credentials models.UserCredent
 	return buildJwt(userId)
 }
 
-func (uc *authUsecase) ValidateToken(token string) (models.UserID, error) {
+func (uc *authUsecase) ValidateToken(token string) (user.UserID, error) {
 	claims := &Claims{}
 	parsedToken, err := jwt.ParseWithClaims(token, claims,
 		func(t *jwt.Token) (interface{}, error) {
@@ -101,7 +101,7 @@ func sha1Hash(pass string) (string, error) {
 	return hashedString, nil
 }
 
-func buildJwt(id models.UserID) (string, error) {
+func buildJwt(id user.UserID) (string, error) {
 	token := jwt.NewWithClaims(
 		jwt.SigningMethodHS256,
 		Claims{

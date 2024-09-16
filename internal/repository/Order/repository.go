@@ -10,6 +10,7 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jmoiron/sqlx"
 	"github.com/tritonol/gophmart.git/internal/models"
+	"github.com/tritonol/gophmart.git/internal/models/user"
 )
 
 type order struct {
@@ -62,7 +63,7 @@ func (r *OrderRepo) Create(ctx context.Context, model *models.Order) error {
 	return nil
 }
 
-func (r *OrderRepo) GetUserOrders(ctx context.Context, userId models.UserID) ([]*models.Order, error) {
+func (r *OrderRepo) GetUserOrders(ctx context.Context, userId user.UserID) ([]*models.Order, error) {
 	res := make([]order, 0)
 	query := `
 		SELECT o.*, b.value FROM orders o
@@ -145,7 +146,7 @@ func toModel(order order) *models.Order {
 	return &models.Order{
 		Id:      order.Id,
 		Status:  models.OrderStatus(order.Status),
-		UserId:  models.UserID(order.UserId),
+		UserId:  user.UserID(order.UserId),
 		Accrual: order.Accrual,
 	}
 }
