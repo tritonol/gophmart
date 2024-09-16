@@ -8,7 +8,7 @@ import (
 	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jmoiron/sqlx"
-	"github.com/tritonol/gophmart.git/internal/models"
+	"github.com/tritonol/gophmart.git/internal/models/user"
 )
 
 type UserRepo struct {
@@ -21,7 +21,7 @@ func New(ctx context.Context, db *sqlx.DB) *UserRepo {
 	}
 }
 
-func (r *UserRepo) Create(ctx context.Context, credentials models.UserCredentials) (models.UserID, error) {
+func (r *UserRepo) Create(ctx context.Context, credentials user.UserCredentials) (user.UserID, error) {
 	var id int64
 	err := r.conn.QueryRowContext(
 		ctx,
@@ -31,15 +31,15 @@ func (r *UserRepo) Create(ctx context.Context, credentials models.UserCredential
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && pgerrcode.UniqueViolation == pgErr.Code {
-			return 0, NewUserAlreadyExistsError(credentials.Login, err)
+			return 0, user.NewUserAlreadyExistsError(credentials.Login, err)
 		}
 		return 0, err
 	}
 
-	return models.UserID(id), nil
+	return user.UserID(id), nil
 }
 
-func (r *UserRepo) CheckByCredentials(ctx context.Context, credentials models.UserCredentials) (models.UserID, error) {
+func (r *UserRepo) CheckByCredentials(ctx context.Context, credentials user.UserCredentials) (user.UserID, error) {
 	var id int64
 
 	err := r.conn.QueryRowContext(
@@ -50,10 +50,10 @@ func (r *UserRepo) CheckByCredentials(ctx context.Context, credentials models.Us
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return 0, NewUserNotFoundError(credentials.Login, err)
+			return 0, user.NewUserNotFoundError(credentials.Login, err)
 		}
 		return 0, err
 	}
 
-	return models.UserID(id), nil
+	return user.UserID(id), nil
 }
