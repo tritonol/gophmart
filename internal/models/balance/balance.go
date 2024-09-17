@@ -9,3 +9,8 @@ type Transaction struct {
 	Value        float64     `db:"value"`
 	Processed_at string      `db:"processed_at"`
 }
+
+type Balance struct {
+	Current   float64 `json:"current"`
+	Withdrawn float64 `json:"withdrawn"`
+}
