@@ -36,10 +36,6 @@ func New(repo AuthRepo) *authUsecase {
 }
 
 func (uc *authUsecase) Register(ctx context.Context, credetials user.UserCredentials) (string, error) {
-	if credetials.Login == "" && credetials.Password == "" {
-		return "", fmt.Errorf("wrong credentials")
-	}
-
 	hashedPass, err := sha1Hash(credetials.Password)
 	if err != nil {
 		return "", err
