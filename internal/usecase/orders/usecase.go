@@ -22,7 +22,12 @@ func New(orders orderRpository) *orderUsecase {
 	}
 }
 
-func (uc *orderUsecase) CreateOrder(ctx context.Context, order models.Order) error {
+func (uc *orderUsecase) CreateOrder(ctx context.Context, number int64, userId user.UserID) error {
+	order := models.Order {
+		Id: number,
+		UserId: userId,
+		Status: "NEW",
+	}
 	err := uc.orders.Create(ctx, &order)
 
 	if err != nil {
