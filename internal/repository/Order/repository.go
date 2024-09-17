@@ -52,9 +52,9 @@ func (r *OrderRepo) Create(ctx context.Context, model *models.Order) error {
 			}
 			fmt.Println(existsForUser)
 			if existsForUser {
-				return ErrAlreadyExists
+				return models.ErrAlreadyExists
 			} else {
-				return ErrCreatedByAnotherUser
+				return models.ErrCreatedByAnotherUser
 			}
 		}
 
