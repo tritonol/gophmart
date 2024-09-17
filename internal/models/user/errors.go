@@ -1,6 +1,8 @@
 package user
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type UserAlreadyExistsError struct {
 	err   error
@@ -14,7 +16,7 @@ func NewUserAlreadyExistsError(login string, err error) *UserAlreadyExistsError 
 	}
 }
 
-func (u *UserAlreadyExistsError) Error() string {
+func (u UserAlreadyExistsError) Error() string {
 	return fmt.Sprintf("login %s already exists: %s", u.login, u.err)
 }
 
