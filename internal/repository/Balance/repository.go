@@ -4,14 +4,8 @@ import (
 	"context"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/tritonol/gophmart.git/internal/models/balance"
 )
-
-type balance struct {
-	Id     int64
-	UserId int64
-	FromId int64
-	Value  float64
-}
 
 type BalanceRepo struct {
 	conn *sqlx.DB
@@ -68,6 +62,22 @@ func (r *BalanceRepo) GetTotalSpent(ctx context.Context, userId int64) (float64,
 	}
 
 	return sum, nil
+}
+
+func (r *BalanceRepo) GetWithdrawals(ctx context.Context, orderId int64, userId int64) ([]*balance.Transaction ,error) {
+	withdrawals := make([]*balance.Transaction, 0)
+	query := `
+		SELECT id, user_id, from_id, value, processed_at 
+		FROM balance WHERE user_id = $1 AND from_id = $2
+		WHERE value < 0
+	`
+
+	err := r.conn.SelectContext(ctx, &withdrawals, query, orderId, userId)
+	if err != nil {
+		return nil, err
+	}
+
+	return withdrawals, nil
 }
 
 func (r *BalanceRepo) GetByOrder(ctx context.Context, orderId int64) (float64, error) {
