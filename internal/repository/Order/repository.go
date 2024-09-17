@@ -9,7 +9,7 @@ import (
 	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jmoiron/sqlx"
-	"github.com/tritonol/gophmart.git/internal/models"
+	models "github.com/tritonol/gophmart.git/internal/models/order"
 	"github.com/tritonol/gophmart.git/internal/models/user"
 )
 
@@ -144,9 +144,10 @@ func toModels(orders []order) []*models.Order {
 
 func toModel(order order) *models.Order {
 	return &models.Order{
-		Id:      order.Id,
-		Status:  models.OrderStatus(order.Status),
-		UserId:  user.UserID(order.UserId),
-		Accrual: order.Accrual,
+		Id:         order.Id,
+		Status:     models.OrderStatus(order.Status),
+		UserId:     user.UserID(order.UserId),
+		Accrual:    order.Accrual,
+		UploadedAt: order.UploadedAt,
 	}
 }

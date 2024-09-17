@@ -3,7 +3,7 @@ package orders
 import (
 	"context"
 
-	"github.com/tritonol/gophmart.git/internal/models"
+	models "github.com/tritonol/gophmart.git/internal/models/order"
 	"github.com/tritonol/gophmart.git/internal/models/user"
 )
 

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/tritonol/gophmart.git/internal/models"
+	"github.com/tritonol/gophmart.git/internal/models/order"
 )
 
 type accrualUsecase struct {
@@ -20,7 +21,7 @@ type balanceRepository interface {
 }
 
 type orderRepository interface {
-	GetUnhandledOrders(ctx context.Context) ([]*models.Order, error)
+	GetUnhandledOrders(ctx context.Context) ([]*order.Order, error)
 	UpdateStatus(ctx context.Context, orderId int64, status string) error
 }
 
