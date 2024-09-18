@@ -6,11 +6,19 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 
 	"github.com/tritonol/gophmart.git/internal/models/order"
 	"github.com/tritonol/gophmart.git/internal/models/user"
 	"github.com/tritonol/gophmart.git/internal/utils/lunh"
 )
+
+type respOrder struct {
+	Number     string  `json:"number"`
+	Accrual    float64 `json:"accrual"`
+	Status     string  `json:"status"`
+	UploadedAt string  `json:"uploaded_at"`
+}
 
 func (s *Server) GetOrders(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
@@ -23,10 +31,12 @@ func (s *Server) GetOrders(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	orders, err := s.order.GetUserOrders(ctx, userId)
+	rawOrders, err := s.order.GetUserOrders(ctx, userId)
 	if err != nil {
 		http.Error(w, "", http.StatusInternalServerError)
 	}
+
+	orders := toRespOrders(rawOrders)
 
 	if len(orders) == 0 {
 		w.Header().Set("content-type", "application/json")
@@ -85,4 +95,24 @@ func (s *Server) CreateOrder(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusAccepted)
+}
+
+func toRespOrders(ords []*order.Order) []*respOrder {
+	ordsLen := len(ords)
+	res := make([]*respOrder, ordsLen)
+
+	for i := 0; i < ordsLen; i++ {
+		res[i] = toRespOrder(ords[i])
+	}
+
+	return res
+}
+
+func toRespOrder(ord *order.Order) *respOrder {
+	return &respOrder{
+		Number: strconv.FormatInt(ord.Id, 10),
+		Accrual: ord.Accrual,
+		Status: string(ord.Status),
+		UploadedAt: ord.UploadedAt,
+	}
 }
