@@ -32,7 +32,7 @@ func (s *Server) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	token, err := s.auth.Register(ctx, toModel(req))
 	if err != nil {
 		var alreadyExists *user.UserAlreadyExistsError
-		if errors.As(err, alreadyExists) {
+		if errors.As(err, &alreadyExists) {
 			http.Error(w, "login already taken", http.StatusConflict)
 			return
 		}
@@ -62,8 +62,8 @@ func (s *Server) LoginUser(w http.ResponseWriter, r *http.Request) {
 
 	token, err := s.auth.Login(ctx, toModel(req))
 	if err != nil {
-		var notFound user.UserNotFoundError
-		if errors.As(err, notFound) {
+		var notFound *user.UserNotFoundError
+		if errors.Is(err, notFound) {
 			http.Error(w, "wrong credentials", http.StatusUnauthorized)
 		}
 

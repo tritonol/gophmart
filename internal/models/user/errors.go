@@ -20,7 +20,7 @@ func (u UserAlreadyExistsError) Error() string {
 	return fmt.Sprintf("login %s already exists: %s", u.login, u.err)
 }
 
-func (u *UserAlreadyExistsError) Unwrap() error {
+func (u UserAlreadyExistsError) Unwrap() error {
 	return u.err
 }
 
