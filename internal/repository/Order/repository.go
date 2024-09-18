@@ -68,7 +68,7 @@ func (r *OrderRepo) GetUserOrders(ctx context.Context, userId user.UserID) ([]*m
 	query := `
 		SELECT o.*, b.value FROM orders o
 		JOIN balance b ON o.id = b.from_id
-		WHERE user_id = $1
+		WHERE o.user_id = $1
 		ORDER BY uploaded_at
 	`
 	err := r.conn.SelectContext(ctx, &res, query, userId)
