@@ -55,7 +55,7 @@ func New(cfg *config.Config, auth ucAuth, order ucOrder, balance ucBalance) *Ser
 	r.Use(middleware.RequestID)
 	r.Use(middleware.Logger)
 
-	s.UserRoutes()
+	s.r.Mount("/api/user/", s.UserRoutes())
 
 	return s
 }
