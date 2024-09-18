@@ -94,7 +94,7 @@ func (r *OrderRepo) UpdateStatus(ctx context.Context, orderId int64, status stri
 func (r *OrderRepo) GetUnhandledOrders(ctx context.Context) ([]*models.Order, error) {
 	query := `
 		SELECT id, status, user_id FROM orders
-		WHERE status != 'INVALID' ADN status != 'PROCESSED'
+		WHERE status != 'INVALID' AND status != 'PROCESSED'
 	`
 	orders := make([]order, 0)
 
