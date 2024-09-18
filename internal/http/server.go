@@ -71,8 +71,8 @@ func (s *Server) UserRoutes() *chi.Mux {
 	userRouter.Group(func(r chi.Router) {
 		r.Use(s.Auth)
 
-		r.Post("/orders", s.GetOrders)
-		r.Get("/orders", s.CreateOrder)
+		r.Post("/orders", s.CreateOrder)
+		r.Get("/orders", s.GetOrders)
 
 		r.Get("/balance", s.GetBalance)
 		r.Post("/balance/withdraw", s.WriteOff)
