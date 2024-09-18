@@ -68,12 +68,12 @@ func (s *Server) CreateOrder(w http.ResponseWriter, r *http.Request) {
 
 	err = s.order.CreateOrder(ctx, orderId, userId)
 	if err != nil {
-		if errors.As(err, order.ErrAlreadyExists) {
+		if errors.Is(err, order.ErrAlreadyExists) {
 			http.Error(w, "", http.StatusConflict)
 			return
 		}
 
-		if errors.As(err, order.ErrCreatedByAnotherUser) {
+		if errors.Is(err, order.ErrCreatedByAnotherUser) {
 			http.Error(w, "", http.StatusConflict)
 			return
 		}

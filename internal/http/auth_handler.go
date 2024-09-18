@@ -31,7 +31,7 @@ func (s *Server) RegisterUser(w http.ResponseWriter, r *http.Request) {
 
 	token, err := s.auth.Register(ctx, toModel(req))
 	if err != nil {
-		var alreadyExists user.UserAlreadyExistsError
+		var alreadyExists *user.UserAlreadyExistsError
 		if errors.As(err, alreadyExists) {
 			http.Error(w, "login already taken", http.StatusConflict)
 			return
