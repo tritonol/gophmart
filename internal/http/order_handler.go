@@ -3,6 +3,7 @@ package http
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 
@@ -14,7 +15,7 @@ import (
 func (s *Server) GetOrders(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	ctxUserID := ctx.Value("user_id")
+	ctxUserID := ctx.Value(keyUserId)
 	userId, ok := ctxUserID.(user.UserID)
 
 	if !ok {
@@ -47,6 +48,13 @@ func (s *Server) GetOrders(w http.ResponseWriter, r *http.Request) {
 func (s *Server) CreateOrder(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
+	ctxUserID := ctx.Value(keyUserId)
+	userId, ok := ctxUserID.(user.UserID)
+	if !ok {
+		http.Error(w, "", http.StatusInternalServerError)
+		return
+	}
+
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, "Can not parse body", http.StatusBadRequest)
@@ -59,17 +67,11 @@ func (s *Server) CreateOrder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ctxUserID := ctx.Value("user_id")
-	userId, ok := ctxUserID.(user.UserID)
-	if !ok {
-		http.Error(w, "", http.StatusInternalServerError)
-		return
-	}
-
 	err = s.order.CreateOrder(ctx, orderId, userId)
 	if err != nil {
+		fmt.Println(err)
 		if errors.Is(err, order.ErrAlreadyExists) {
-			http.Error(w, "", http.StatusConflict)
+			http.Error(w, "", http.StatusOK)
 			return
 		}
 

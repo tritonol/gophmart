@@ -16,7 +16,7 @@ type withdrawal struct {
 func (s *Server) GetBalance(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	ctxUserID := ctx.Value("user_id")
+	ctxUserID := ctx.Value(keyUserId)
 	userId, ok := ctxUserID.(user.UserID)
 
 	if !ok {
@@ -43,7 +43,7 @@ func (s *Server) GetBalance(w http.ResponseWriter, r *http.Request) {
 func (s *Server) WriteOff(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	ctxUserID := ctx.Value("user_id")
+	ctxUserID := ctx.Value(keyUserId)
 	userId, ok := ctxUserID.(user.UserID)
 	if !ok {
 		http.Error(w, "", http.StatusInternalServerError)
@@ -81,7 +81,7 @@ func (s *Server) WriteOff(w http.ResponseWriter, r *http.Request) {
 func (s *Server) WithdrawalsHistory(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	ctxUserID := ctx.Value("user_id")
+	ctxUserID := ctx.Value(keyUserId)
 	userId, ok := ctxUserID.(user.UserID)
 	if !ok {
 		http.Error(w, "", http.StatusInternalServerError)
