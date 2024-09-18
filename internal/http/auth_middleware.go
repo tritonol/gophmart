@@ -9,7 +9,9 @@ import (
 	"github.com/tritonol/gophmart.git/internal/models/user"
 )
 
-const keyUserId = "userId"
+type AuthUserId string
+
+const keyUserId AuthUserId = "userId"
 
 func (s *Server) Auth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -41,7 +43,7 @@ func (s *Server) Auth(next http.Handler) http.Handler {
 		}
 
 		ctx := context.WithValue(r.Context(), keyUserId, userId)
-		r.WithContext(ctx)
+		r = r.WithContext(ctx)
 
 		next.ServeHTTP(w, r)
 	})
