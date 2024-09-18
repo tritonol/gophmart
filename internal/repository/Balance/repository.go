@@ -37,7 +37,7 @@ func (r *BalanceRepo) GetCurrent(ctx context.Context, userId int64) (float64, er
 
 	err := r.conn.QueryRowContext(
 		ctx,
-		`SELECT SUM(value) FROM balance WHERE user_id = $1`,
+		`SELECT COALESCE(SUM(value), 0) FROM balance WHERE user_id = $1`,
 		userId,
 	).Scan(&sum)
 
@@ -53,7 +53,7 @@ func (r *BalanceRepo) GetTotalSpent(ctx context.Context, userId int64) (float64,
 
 	err := r.conn.QueryRowContext(
 		ctx,
-		`SELECT ABS(SUM(value)) FROM balance WHERE user_id = $1 AND value < 0`,
+		`SELECT COALESCE(ABS(SUM(value)), 0) FROM balance WHERE user_id = $1 AND value < 0`,
 		userId,
 	).Scan(&sum)
 
