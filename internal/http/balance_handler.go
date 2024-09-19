@@ -3,7 +3,9 @@ package http
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
+	"github.com/tritonol/gophmart.git/internal/models/balance"
 	"github.com/tritonol/gophmart.git/internal/models/user"
 	"github.com/tritonol/gophmart.git/internal/utils/lunh"
 )
@@ -11,6 +13,7 @@ import (
 type withdrawal struct {
 	Order string  `json:"order"`
 	Sum   float64 `json:"sum"`
+	Processed_at string `json:"processed_at"`
 }
 
 func (s *Server) GetBalance(w http.ResponseWriter, r *http.Request) {
@@ -88,17 +91,19 @@ func (s *Server) WithdrawalsHistory(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	withdrawals, err :=s.balance.WithdrawalsHistory(ctx, userId)
+	rawWithdrawals, err :=s.balance.WithdrawalsHistory(ctx, userId)
 	if err != nil {
 		http.Error(w, "", http.StatusInternalServerError)
 		return
 	}
 
-	if len(withdrawals) == 0 {
+	if len(rawWithdrawals) == 0 {
 		w.Header().Set("content-type", "application/json")
 		w.WriteHeader(http.StatusNoContent)
 		return
 	}
+
+	withdrawals := toWithdrawals(rawWithdrawals)
 
 	result, err := json.Marshal(withdrawals)
 	if err != nil {
@@ -109,4 +114,23 @@ func (s *Server) WithdrawalsHistory(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(result)
+}
+
+func toWithdrawals(transactions []*balance.Transaction) []*withdrawal {
+	countTransactions := len(transactions)
+	res := make([]*withdrawal, countTransactions)
+
+	for i := 0; i < countTransactions; i++ {
+		res[i] = toWithdrawal(transactions[i])
+	}
+
+	return res
+}
+
+func toWithdrawal(transaction *balance.Transaction) *withdrawal {
+	return &withdrawal{
+		Order: strconv.FormatInt(transaction.OrderNum, 10),
+		Sum: -transaction.Value,
+		Processed_at: transaction.Processed_at,
+	}
 }
