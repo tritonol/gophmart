@@ -96,7 +96,7 @@ func (s *Server) Run(ctx context.Context) {
 
 	go func() {
 		<-sig
-		shutdownCtx, shutdownCancel := context.WithTimeout(serverCtx, 10*time.Second)
+		shutdownCtx, shutdownCancel := context.WithTimeout(serverCtx, 30*time.Second)
 		defer shutdownCancel()
 
 		go func() {
