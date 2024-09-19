@@ -4,8 +4,8 @@ CREATE TABLE IF NOT EXISTS "balance" (
     "id" SERIAL PRIMARY KEY,
     "user_id" INTEGER,
     "from" VARCHAR,
-    "from_id" INTEGER,
-    "value" INTEGER,
+    "from_id" BIGINT,
+    "value" BIGINT,
     "type" INTEGER,
 
     CONSTRAINT fk_user_id
