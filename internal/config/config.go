@@ -26,7 +26,7 @@ func MustLoad() (*Config, error) {
 		cfg.DbUri = dbUri
 	}
 
-	if accrualAddress := os.Getenv("RUN_ADDRESS"); accrualAddress != "" {
+	if accrualAddress := os.Getenv("ACCRUAL_SYSTEM_ADDRESS"); accrualAddress != "" {
 		cfg.AccrualAddress = accrualAddress
 	}
 
