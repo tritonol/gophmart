@@ -78,8 +78,8 @@ func (r *OrderRepo) GetUserOrders(ctx context.Context, userId user.UserID) ([]*m
 
 func (r *OrderRepo) UpdateStatus(ctx context.Context, orderId int64, status string) error {
 	_, err := r.conn.ExecContext(ctx, `
-		UPDATE orders SET status = $1
-		WHERE order_id = $2
+		UPDATE orders SET status = $2
+		WHERE id = $1
 		`,
 		orderId, status,
 	)
