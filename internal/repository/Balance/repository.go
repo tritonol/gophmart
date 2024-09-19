@@ -68,8 +68,7 @@ func (r *BalanceRepo) GetWithdrawals(ctx context.Context, userId int64) ([]*bala
 	withdrawals := make([]*balance.Transaction, 0)
 	query := `
 		SELECT id, user_id, from_id, value, processed_at 
-		FROM balance WHERE user_id = $1
-		WHERE value < 0
+		FROM balance WHERE user_id = $1 AND value < 0
 	`
 
 	err := r.conn.SelectContext(ctx, &withdrawals, query, userId)
