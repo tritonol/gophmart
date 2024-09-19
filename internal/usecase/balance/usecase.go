@@ -51,7 +51,7 @@ func (uc *balanceUsecase) WriteOff(ctx context.Context, userId user.UserID, orde
 		return balance.ErrInsufficientFunds
 	}
 
-	err = uc.balance.Conduct(ctx, int64(userId), orderNum, -value)
+	err = uc.balance.Conduct(ctx, int64(userId), orderNum, value)
 	if err != nil {
 		return err
 	}
