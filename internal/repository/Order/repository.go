@@ -59,7 +59,7 @@ func (r *OrderRepo) Create(ctx context.Context, model *models.Order) error {
 	return nil
 }
 
-func (r *OrderRepo) GetUserOrders(ctx context.Context, userId user.UserID) ([]*models.Order, error) {
+func (r *OrderRepo) GetUserOrders(ctx context.Context, userID user.UserID) ([]*models.Order, error) {
 	res := make([]order, 0)
 	query := `
 		SELECT o.*, COALESCE(b.value, 0) AS value FROM orders o
@@ -67,7 +67,7 @@ func (r *OrderRepo) GetUserOrders(ctx context.Context, userId user.UserID) ([]*m
 		WHERE o.user_id = $1
 		ORDER BY uploaded_at
 	`
-	err := r.conn.SelectContext(ctx, &res, query, userId)
+	err := r.conn.SelectContext(ctx, &res, query, userID)
 
 	if err != nil {
 		return nil, err

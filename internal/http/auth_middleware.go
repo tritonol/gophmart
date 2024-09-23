@@ -34,15 +34,15 @@ func (s *Server) Auth(next http.Handler) http.Handler {
 			token = splitedCookie[1]
 		}
 
-		var userId user.UserID
+		var userID user.UserID
 
-		userId, err = s.auth.ValidateToken(token)
+		userID, err = s.auth.ValidateToken(token)
 		if err != nil {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), keyUserID, userId)
+		ctx := context.WithValue(r.Context(), keyUserID, userID)
 		r = r.WithContext(ctx)
 
 		next.ServeHTTP(w, r)
