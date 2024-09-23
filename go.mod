@@ -1,10 +1,10 @@
 module github.com/tritonol/gophmart.git
 
-go 1.23
+go 1.22.7
 
 require (
 	github.com/go-chi/chi/v5 v5.1.0
-	github.com/go-resty/resty/v2 v2.15.1
+	github.com/go-resty/resty/v2 v2.15.2
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/jackc/pgerrcode v0.0.0-20240316143900-6e2875d9b438
 	github.com/jackc/pgx/v5 v5.7.1
