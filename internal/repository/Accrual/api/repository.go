@@ -20,13 +20,13 @@ func New(address string) *Accrual {
 	}
 }
 
-func (a *Accrual) GetAccrual(ctx context.Context, orderId int64) (*models.Accrual, error) {
+func (a *Accrual) GetAccrual(ctx context.Context, orderID int64) (*models.Accrual, error) {
 	res := &models.Accrual{}
 
 	resp, err := a.client.R().
 		SetContext(ctx).
 		SetResult(res).
-		Get("api/orders/" + strconv.FormatInt(orderId, 10))
+		Get("api/orders/" + strconv.FormatInt(orderID, 10))
 
 	if err != nil {
 		return nil, err

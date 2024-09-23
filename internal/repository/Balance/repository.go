@@ -17,12 +17,12 @@ func New(ctx context.Context, db *sqlx.DB) *BalanceRepo {
 	}
 }
 
-func (r *BalanceRepo) Conduct(ctx context.Context, userId, fromId int64, value float64) error {
+func (r *BalanceRepo) Conduct(ctx context.Context, userID, fromID int64, value float64) error {
 	_, err := r.conn.ExecContext(ctx, `
 		INSERT INTO balance (user_id, from_id, value)
 		VALUES ($1, $2, $3)
 		`,
-		userId, fromId, value,
+		userID, fromID, value,
 	)
 
 	if err != nil {
@@ -32,13 +32,13 @@ func (r *BalanceRepo) Conduct(ctx context.Context, userId, fromId int64, value f
 	return nil
 }
 
-func (r *BalanceRepo) GetCurrent(ctx context.Context, userId int64) (float64, error) {
+func (r *BalanceRepo) GetCurrent(ctx context.Context, userID int64) (float64, error) {
 	var sum float64
 
 	err := r.conn.QueryRowContext(
 		ctx,
 		`SELECT COALESCE(SUM(value), 0) FROM balance WHERE user_id = $1`,
-		userId,
+		userID,
 	).Scan(&sum)
 
 	if err != nil {
@@ -48,13 +48,13 @@ func (r *BalanceRepo) GetCurrent(ctx context.Context, userId int64) (float64, er
 	return sum, nil
 }
 
-func (r *BalanceRepo) GetTotalSpent(ctx context.Context, userId int64) (float64, error) {
+func (r *BalanceRepo) GetTotalSpent(ctx context.Context, userID int64) (float64, error) {
 	var sum float64
 
 	err := r.conn.QueryRowContext(
 		ctx,
 		`SELECT COALESCE(ABS(SUM(value)), 0) FROM balance WHERE user_id = $1 AND value < 0`,
-		userId,
+		userID,
 	).Scan(&sum)
 
 	if err != nil {
@@ -64,14 +64,14 @@ func (r *BalanceRepo) GetTotalSpent(ctx context.Context, userId int64) (float64,
 	return sum, nil
 }
 
-func (r *BalanceRepo) GetWithdrawals(ctx context.Context, userId int64) ([]*balance.Transaction ,error) {
+func (r *BalanceRepo) GetWithdrawals(ctx context.Context, userID int64) ([]*balance.Transaction ,error) {
 	withdrawals := make([]*balance.Transaction, 0)
 	query := `
 		SELECT id, user_id, from_id, value, processed_at 
 		FROM balance WHERE user_id = $1 AND value < 0
 	`
 
-	err := r.conn.SelectContext(ctx, &withdrawals, query, userId)
+	err := r.conn.SelectContext(ctx, &withdrawals, query, userID)
 	if err != nil {
 		return nil, err
 	}

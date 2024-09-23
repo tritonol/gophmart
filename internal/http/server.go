@@ -31,14 +31,14 @@ type ucAuth interface {
 }
 
 type ucOrder interface {
-	CreateOrder(ctx context.Context, number int64, userId user.UserID) error
-	GetUserOrders(ctx context.Context, userId user.UserID) ([]*order.Order, error)
+	CreateOrder(ctx context.Context, number int64, userID user.UserID) error
+	GetUserOrders(ctx context.Context, userID user.UserID) ([]*order.Order, error)
 }
 
 type ucBalance interface {
-	GetBalance(ctx context.Context, userId user.UserID) (*balance.Balance, error)
-	WriteOff(ctx context.Context, userId user.UserID, orderNum int64, value float64) error
-	WithdrawalsHistory(ctx context.Context, userId user.UserID) ([]*balance.Transaction, error)
+	GetBalance(ctx context.Context, userID user.UserID) (*balance.Balance, error)
+	WriteOff(ctx context.Context, userID user.UserID, orderNum int64, value float64) error
+	WithdrawalsHistory(ctx context.Context, userID user.UserID) ([]*balance.Transaction, error)
 }
 
 func New(cfg *config.Config, auth ucAuth, order ucOrder, balance ucBalance) *Server {

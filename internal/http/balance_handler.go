@@ -13,21 +13,21 @@ import (
 type withdrawal struct {
 	Order string  `json:"order"`
 	Sum   float64 `json:"sum"`
-	Processed_at string `json:"processed_at"`
+	ProcessedAt string `json:"processed_at"`
 }
 
 func (s *Server) GetBalance(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	ctxUserID := ctx.Value(keyUserId)
-	userId, ok := ctxUserID.(user.UserID)
+	ctxUserID := ctx.Value(keyUserID)
+	userID, ok := ctxUserID.(user.UserID)
 
 	if !ok {
 		http.Error(w, "", http.StatusInternalServerError)
 		return
 	}
 
-	balance, err := s.balance.GetBalance(ctx, userId)
+	balance, err := s.balance.GetBalance(ctx, userID)
 	if err != nil {
 		http.Error(w, "", http.StatusInternalServerError)
 		return
@@ -46,8 +46,8 @@ func (s *Server) GetBalance(w http.ResponseWriter, r *http.Request) {
 func (s *Server) WriteOff(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	ctxUserID := ctx.Value(keyUserId)
-	userId, ok := ctxUserID.(user.UserID)
+	ctxUserID := ctx.Value(keyUserID)
+	userID, ok := ctxUserID.(user.UserID)
 	if !ok {
 		http.Error(w, "", http.StatusInternalServerError)
 		return
@@ -60,7 +60,7 @@ func (s *Server) WriteOff(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	balance, err := s.balance.GetBalance(ctx, userId)
+	balance, err := s.balance.GetBalance(ctx, userID)
 
 	if err != nil {
 		http.Error(w, "", http.StatusInternalServerError)
@@ -72,26 +72,26 @@ func (s *Server) WriteOff(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	orderId, err := lunh.Validate(withdraw.Order)
+	orderID, err := lunh.Validate(withdraw.Order)
 	if err != nil {
 		http.Error(w, "wrong number format", http.StatusUnprocessableEntity)
 		return
 	}
 
-	s.balance.WriteOff(ctx, userId, orderId, -withdraw.Sum)
+	s.balance.WriteOff(ctx, userID, orderID, -withdraw.Sum)
 }
 
 func (s *Server) WithdrawalsHistory(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	ctxUserID := ctx.Value(keyUserId)
-	userId, ok := ctxUserID.(user.UserID)
+	ctxUserID := ctx.Value(keyUserID)
+	userID, ok := ctxUserID.(user.UserID)
 	if !ok {
 		http.Error(w, "", http.StatusInternalServerError)
 		return
 	}
 
-	rawWithdrawals, err :=s.balance.WithdrawalsHistory(ctx, userId)
+	rawWithdrawals, err :=s.balance.WithdrawalsHistory(ctx, userID)
 	if err != nil {
 		http.Error(w, "", http.StatusInternalServerError)
 		return
@@ -131,6 +131,6 @@ func toWithdrawal(transaction *balance.Transaction) *withdrawal {
 	return &withdrawal{
 		Order: strconv.FormatInt(transaction.OrderNum, 10),
 		Sum: -transaction.Value,
-		Processed_at: transaction.Processed_at,
+		ProcessedAt: transaction.ProcessedAt,
 	}
 }

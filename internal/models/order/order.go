@@ -12,9 +12,9 @@ const (
 )
 
 type Order struct {
-	Id         int64       `json:"number"`
+	ID         int64       `json:"number"`
 	Accrual    float64     `json:"accrual"`
 	Status     OrderStatus `json:"status"`
 	UploadedAt string      `json:"uploaded_at"`
-	UserId     user.UserID
+	UserID     user.UserID
 }

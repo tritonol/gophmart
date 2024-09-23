@@ -7,14 +7,14 @@ import (
 
 type Config struct {
 	RunAddress     string
-	DbUri          string
+	DBURI          string
 	AccrualAddress string
 }
 
 func MustLoad() (*Config, error) {
 	var cfg Config
 	flag.StringVar(&cfg.RunAddress, "a", ":8000", "Address to run server")
-	flag.StringVar(&cfg.DbUri, "d", "", "Datatbase connection string")
+	flag.StringVar(&cfg.DBURI, "d", "", "Datatbase connection string")
 	flag.StringVar(&cfg.AccrualAddress, "r", "", "Accural system addres")
 	flag.Parse()
 
@@ -22,8 +22,8 @@ func MustLoad() (*Config, error) {
 		cfg.RunAddress = envRunAddress
 	}
 
-	if dbUri := os.Getenv("DATABASE_URI"); dbUri != "" {
-		cfg.DbUri = dbUri
+	if dbURI := os.Getenv("DATABASE_URI"); dbURI != "" {
+		cfg.DBURI = dbURI
 	}
 
 	if accrualAddress := os.Getenv("ACCRUAL_SYSTEM_ADDRESS"); accrualAddress != "" {

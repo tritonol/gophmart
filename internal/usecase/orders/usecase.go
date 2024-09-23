@@ -13,7 +13,7 @@ type orderUsecase struct {
 
 type orderRpository interface {
 	Create(ctx context.Context, model *models.Order) error
-	GetUserOrders(ctx context.Context, userId user.UserID) ([]*models.Order, error)
+	GetUserOrders(ctx context.Context, userID user.UserID) ([]*models.Order, error)
 }
 
 func New(orders orderRpository) *orderUsecase {
@@ -22,10 +22,10 @@ func New(orders orderRpository) *orderUsecase {
 	}
 }
 
-func (uc *orderUsecase) CreateOrder(ctx context.Context, number int64, userId user.UserID) error {
+func (uc *orderUsecase) CreateOrder(ctx context.Context, number int64, userID user.UserID) error {
 	order := models.Order {
-		Id: number,
-		UserId: userId,
+		ID: number,
+		UserID: userID,
 		Status: "NEW",
 	}
 	err := uc.orders.Create(ctx, &order)
@@ -36,8 +36,8 @@ func (uc *orderUsecase) CreateOrder(ctx context.Context, number int64, userId us
 	return nil
 }
 
-func (uc *orderUsecase) GetUserOrders(ctx context.Context, userId user.UserID) ([]*models.Order, error) {
-	res, err := uc.orders.GetUserOrders(ctx, userId)
+func (uc *orderUsecase) GetUserOrders(ctx context.Context, userID user.UserID) ([]*models.Order, error) {
+	res, err := uc.orders.GetUserOrders(ctx, userID)
 	if err != nil {
 		return nil, err
 	}

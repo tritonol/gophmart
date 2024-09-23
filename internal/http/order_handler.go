@@ -23,15 +23,15 @@ type respOrder struct {
 func (s *Server) GetOrders(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	ctxUserID := ctx.Value(keyUserId)
-	userId, ok := ctxUserID.(user.UserID)
+	ctxUserID := ctx.Value(keyUserID)
+	userID, ok := ctxUserID.(user.UserID)
 
 	if !ok {
 		http.Error(w, "", http.StatusInternalServerError)
 		return
 	}
 
-	rawOrders, err := s.order.GetUserOrders(ctx, userId)
+	rawOrders, err := s.order.GetUserOrders(ctx, userID)
 	if err != nil {
 		http.Error(w, "", http.StatusInternalServerError)
 	}
@@ -58,8 +58,8 @@ func (s *Server) GetOrders(w http.ResponseWriter, r *http.Request) {
 func (s *Server) CreateOrder(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	ctxUserID := ctx.Value(keyUserId)
-	userId, ok := ctxUserID.(user.UserID)
+	ctxUserID := ctx.Value(keyUserID)
+	userID, ok := ctxUserID.(user.UserID)
 	if !ok {
 		http.Error(w, "", http.StatusInternalServerError)
 		return
@@ -71,13 +71,13 @@ func (s *Server) CreateOrder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	orderId, err := lunh.Validate(string(body))
+	orderID, err := lunh.Validate(string(body))
 	if err != nil {
 		http.Error(w, "wrong number format", http.StatusUnprocessableEntity)
 		return
 	}
 
-	err = s.order.CreateOrder(ctx, orderId, userId)
+	err = s.order.CreateOrder(ctx, orderID, userID)
 	if err != nil {
 		fmt.Println(err)
 		if errors.Is(err, order.ErrAlreadyExists) {
@@ -110,7 +110,7 @@ func toRespOrders(ords []*order.Order) []*respOrder {
 
 func toRespOrder(ord *order.Order) *respOrder {
 	return &respOrder{
-		Number: strconv.FormatInt(ord.Id, 10),
+		Number: strconv.FormatInt(ord.ID, 10),
 		Accrual: ord.Accrual,
 		Status: string(ord.Status),
 		UploadedAt: ord.UploadedAt,

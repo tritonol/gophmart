@@ -17,7 +17,7 @@ const (
 
 type Claims struct {
 	jwt.RegisteredClaims
-	Id user.UserID
+	ID user.UserID
 }
 
 type authUsecase struct {
@@ -42,12 +42,12 @@ func (uc *authUsecase) Register(ctx context.Context, credetials user.UserCredent
 	}
 	credetials.Password = hashedPass
 
-	userId, err := uc.repo.Create(ctx, credetials)
+	userID, err := uc.repo.Create(ctx, credetials)
 	if err != nil {
 		return "", err
 	}
 
-	return buildJwt(userId)
+	return buildJwt(userID)
 }
 
 func (uc *authUsecase) Login(ctx context.Context, credentials user.UserCredentials) (string, error) {
@@ -57,12 +57,12 @@ func (uc *authUsecase) Login(ctx context.Context, credentials user.UserCredentia
 	}
 	credentials.Password = hashedPass
 
-	userId, err := uc.repo.CheckByCredentials(ctx, credentials)
+	userID, err := uc.repo.CheckByCredentials(ctx, credentials)
 	if err != nil {
 		return "", nil
 	}
 
-	return buildJwt(userId)
+	return buildJwt(userID)
 }
 
 func (uc *authUsecase) ValidateToken(token string) (user.UserID, error) {
@@ -82,7 +82,7 @@ func (uc *authUsecase) ValidateToken(token string) (user.UserID, error) {
 		return 0, fmt.Errorf("token is invalid")
 	}
 
-	return claims.Id, nil
+	return claims.ID, nil
 }
 
 func sha1Hash(pass string) (string, error) {
@@ -101,7 +101,7 @@ func buildJwt(id user.UserID) (string, error) {
 	token := jwt.NewWithClaims(
 		jwt.SigningMethodHS256,
 		Claims{
-			Id: id,
+			ID: id,
 		},
 	)
 

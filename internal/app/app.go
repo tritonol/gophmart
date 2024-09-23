@@ -25,7 +25,7 @@ func Run() {
 		panic("can't init config")
 	}
 
-	db, err := pg.NewConnection(ctx, cfg.DbUri)
+	db, err := pg.NewConnection(ctx, cfg.DBURI)
 	if err != nil {
 		fmt.Println(err)
 		panic("can't init database")

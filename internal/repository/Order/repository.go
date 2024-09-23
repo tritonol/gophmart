@@ -13,8 +13,8 @@ import (
 )
 
 type order struct {
-	Id         int64   `db:"id"`
-	UserId     int64   `db:"user_id"`
+	ID         int64   `db:"id"`
+	UserID     int64   `db:"user_id"`
 	Status     string  `db:"status"`
 	Accrual    float64 `db:"value"`
 	UploadedAt string  `db:"uploaded_at"`
@@ -37,7 +37,7 @@ func (r *OrderRepo) Create(ctx context.Context, model *models.Order) error {
 		INSERT INTO orders(id, user_id, status, uploaded_at)
 		VALUES ($1, $2, $3, $4) RETURNING user_id
 		`,
-		order.Id, order.UserId, order.Status, order.UploadedAt,
+		order.ID, order.UserID, order.Status, order.UploadedAt,
 	)
 
 	if err != nil {
@@ -76,12 +76,12 @@ func (r *OrderRepo) GetUserOrders(ctx context.Context, userId user.UserID) ([]*m
 	return toModels(res), nil
 }
 
-func (r *OrderRepo) UpdateStatus(ctx context.Context, orderId int64, status string) error {
+func (r *OrderRepo) UpdateStatus(ctx context.Context, orderID int64, status string) error {
 	_, err := r.conn.ExecContext(ctx, `
 		UPDATE orders SET status = $2
 		WHERE id = $1
 		`,
-		orderId, status,
+		orderID, status,
 	)
 
 	if err != nil {
@@ -112,7 +112,7 @@ func (r *OrderRepo) isExistsForUser(ctx context.Context, order order) (bool, err
 	err := r.conn.QueryRowContext(
 		ctx,
 		`SELECT EXISTS(SELECT 1 FROM orders WHERE id = $1 AND user_id = $2)`,
-		order.Id, order.UserId,
+		order.ID, order.UserID,
 	).Scan(&exists)
 	if err != nil {
 		return false, err
@@ -123,8 +123,8 @@ func (r *OrderRepo) isExistsForUser(ctx context.Context, order order) (bool, err
 
 func toOrder(model *models.Order, uploadedAt time.Time) order {
 	return order{
-		Id:         model.Id,
-		UserId:     int64(model.UserId),
+		ID:         model.ID,
+		UserID:     int64(model.UserID),
 		Status:     string(model.Status),
 		UploadedAt: uploadedAt.Format("2006-01-02T15:04:05Z07:00"),
 	}
@@ -141,9 +141,9 @@ func toModels(orders []order) []*models.Order {
 
 func toModel(order order) *models.Order {
 	return &models.Order{
-		Id:         order.Id,
+		ID:         order.ID,
 		Status:     models.OrderStatus(order.Status),
-		UserId:     user.UserID(order.UserId),
+		UserID:     user.UserID(order.UserID),
 		Accrual:    order.Accrual,
 		UploadedAt: order.UploadedAt,
 	}

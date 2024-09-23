@@ -13,23 +13,23 @@ type accrualUsecase struct {
 	orders  orderRepository
 	balance balanceRepository
 	
-	accrual accrualApi
+	accrual accrualAPI
 }
 
 type balanceRepository interface {
-	Conduct(ctx context.Context, userId, fromId int64, value float64) error
+	Conduct(ctx context.Context, userID, fromID int64, value float64) error
 }
 
 type orderRepository interface {
 	GetUnhandledOrders(ctx context.Context) ([]*order.Order, error)
-	UpdateStatus(ctx context.Context, orderId int64, status string) error
+	UpdateStatus(ctx context.Context, orderID int64, status string) error
 }
 
-type accrualApi interface {
-	GetAccrual(ctx context.Context, orderId int64) (*models.Accrual, error)
+type accrualAPI interface {
+	GetAccrual(ctx context.Context, orderID int64) (*models.Accrual, error)
 }
 
-func New(orders orderRepository, accrual accrualApi, balance balanceRepository) *accrualUsecase {
+func New(orders orderRepository, accrual accrualAPI, balance balanceRepository) *accrualUsecase {
 	return &accrualUsecase{
 		orders:  orders,
 		accrual: accrual,
@@ -65,20 +65,20 @@ func (uc *accrualUsecase) updateOrders(ctx context.Context) {
 	}
 
 	for _, v := range unhandledOrders {
-		res, err := uc.accrual.GetAccrual(ctx, v.Id)
+		res, err := uc.accrual.GetAccrual(ctx, v.ID)
 		if err != nil {
 			fmt.Println(err)
 			continue 
 		}
 		if res.Status != string(v.Status) {
-			err := uc.orders.UpdateStatus(ctx, v.Id, res.Status)
+			err := uc.orders.UpdateStatus(ctx, v.ID, res.Status)
 			if err != nil {
 				fmt.Println(err)
 				continue
 			}
 		}
 		if res.Value > 0 {
-			err := uc.balance.Conduct(ctx, int64(v.UserId), v.Id, res.Value)
+			err := uc.balance.Conduct(ctx, int64(v.UserID), v.ID, res.Value)
 			if err != nil {
 				fmt.Println(err)
 				continue
