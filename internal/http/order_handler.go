@@ -27,13 +27,13 @@ func (s *Server) GetOrders(w http.ResponseWriter, r *http.Request) {
 	userID, ok := ctxUserID.(user.UserID)
 
 	if !ok {
-		http.Error(w, "", http.StatusInternalServerError)
+		http.Error(w, "unable to get user id", http.StatusInternalServerError)
 		return
 	}
 
 	rawOrders, err := s.order.GetUserOrders(ctx, userID)
 	if err != nil {
-		http.Error(w, "", http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
 	orders := toRespOrders(rawOrders)
@@ -46,7 +46,7 @@ func (s *Server) GetOrders(w http.ResponseWriter, r *http.Request) {
 
 	result, err := json.Marshal(orders)
 	if err != nil {
-		http.Error(w, "", http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -61,7 +61,7 @@ func (s *Server) CreateOrder(w http.ResponseWriter, r *http.Request) {
 	ctxUserID := ctx.Value(keyUserID)
 	userID, ok := ctxUserID.(user.UserID)
 	if !ok {
-		http.Error(w, "", http.StatusInternalServerError)
+		http.Error(w, "unable to get user id", http.StatusInternalServerError)
 		return
 	}
 
@@ -90,7 +90,7 @@ func (s *Server) CreateOrder(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		http.Error(w, "", http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -110,9 +110,9 @@ func toRespOrders(ords []*order.Order) []*respOrder {
 
 func toRespOrder(ord *order.Order) *respOrder {
 	return &respOrder{
-		Number: strconv.FormatInt(ord.ID, 10),
-		Accrual: ord.Accrual,
-		Status: string(ord.Status),
+		Number:     strconv.FormatInt(ord.ID, 10),
+		Accrual:    ord.Accrual,
+		Status:     string(ord.Status),
 		UploadedAt: ord.UploadedAt,
 	}
 }

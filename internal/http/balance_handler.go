@@ -11,9 +11,9 @@ import (
 )
 
 type withdrawal struct {
-	Order string  `json:"order"`
-	Sum   float64 `json:"sum"`
-	ProcessedAt string `json:"processed_at"`
+	Order       string  `json:"order"`
+	Sum         float64 `json:"sum"`
+	ProcessedAt string  `json:"processed_at"`
 }
 
 func (s *Server) GetBalance(w http.ResponseWriter, r *http.Request) {
@@ -23,19 +23,19 @@ func (s *Server) GetBalance(w http.ResponseWriter, r *http.Request) {
 	userID, ok := ctxUserID.(user.UserID)
 
 	if !ok {
-		http.Error(w, "", http.StatusInternalServerError)
+		http.Error(w, "unable to get user id", http.StatusInternalServerError)
 		return
 	}
 
 	balance, err := s.balance.GetBalance(ctx, userID)
 	if err != nil {
-		http.Error(w, "", http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	result, err := json.Marshal(balance)
 	if err != nil {
-		http.Error(w, "", http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
 	w.Header().Set("content-type", "application/json")
@@ -49,7 +49,7 @@ func (s *Server) WriteOff(w http.ResponseWriter, r *http.Request) {
 	ctxUserID := ctx.Value(keyUserID)
 	userID, ok := ctxUserID.(user.UserID)
 	if !ok {
-		http.Error(w, "", http.StatusInternalServerError)
+		http.Error(w, "unable to get user id", http.StatusInternalServerError)
 		return
 	}
 
@@ -63,7 +63,7 @@ func (s *Server) WriteOff(w http.ResponseWriter, r *http.Request) {
 	balance, err := s.balance.GetBalance(ctx, userID)
 
 	if err != nil {
-		http.Error(w, "", http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -78,7 +78,11 @@ func (s *Server) WriteOff(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	s.balance.WriteOff(ctx, userID, orderID, -withdraw.Sum)
+	err = s.balance.WriteOff(ctx, userID, orderID, -withdraw.Sum)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
 func (s *Server) WithdrawalsHistory(w http.ResponseWriter, r *http.Request) {
@@ -87,13 +91,13 @@ func (s *Server) WithdrawalsHistory(w http.ResponseWriter, r *http.Request) {
 	ctxUserID := ctx.Value(keyUserID)
 	userID, ok := ctxUserID.(user.UserID)
 	if !ok {
-		http.Error(w, "", http.StatusInternalServerError)
+		http.Error(w, "unable to get user id", http.StatusInternalServerError)
 		return
 	}
 
-	rawWithdrawals, err :=s.balance.WithdrawalsHistory(ctx, userID)
+	rawWithdrawals, err := s.balance.WithdrawalsHistory(ctx, userID)
 	if err != nil {
-		http.Error(w, "", http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -107,7 +111,7 @@ func (s *Server) WithdrawalsHistory(w http.ResponseWriter, r *http.Request) {
 
 	result, err := json.Marshal(withdrawals)
 	if err != nil {
-		http.Error(w, "", http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -129,8 +133,8 @@ func toWithdrawals(transactions []*balance.Transaction) []*withdrawal {
 
 func toWithdrawal(transaction *balance.Transaction) *withdrawal {
 	return &withdrawal{
-		Order: strconv.FormatInt(transaction.OrderNum, 10),
-		Sum: -transaction.Value,
+		Order:       strconv.FormatInt(transaction.OrderNum, 10),
+		Sum:         -transaction.Value,
 		ProcessedAt: transaction.ProcessedAt,
 	}
 }

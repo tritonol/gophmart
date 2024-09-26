@@ -20,7 +20,7 @@ func (s *Server) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	var req credentials
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "can't pasrde body", http.StatusBadRequest)
+		http.Error(w, "can't parse body", http.StatusBadRequest)
 		return
 	}
 
@@ -37,7 +37,7 @@ func (s *Server) RegisterUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		http.Error(w, "", http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -67,7 +67,7 @@ func (s *Server) LoginUser(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "wrong credentials", http.StatusUnauthorized)
 		}
 
-		http.Error(w, "", http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 

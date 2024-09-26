@@ -10,10 +10,10 @@ import (
 )
 
 func NewConnection(ctx context.Context, connString string) (*sqlx.DB, error) {
-	_, cancel := context.WithTimeout(ctx, time.Second*5)
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
-	db, err := sqlx.Connect("pgx", connString)
+	db, err := sqlx.ConnectContext(ctx, "pgx", connString)
 	if err != nil {
 		return nil, err
 	}
